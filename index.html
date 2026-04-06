@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Asesmen SDN 1 Gondang</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0284c7;
+            --secondary-blue: #93c5fd;
+            --accent-green: #10b981;
+            --bg-gray: #f3f4f6;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            max-height: 850px;
+            background-color: #ffffff;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            position: relative;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 640px) {
+            .app-container {
+                height: 90vh;
+                border-radius: 24px;
+            }
+        }
+
+        .font-sahabat {
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.1em;
+            background: linear-gradient(to bottom, #1e293b, #334155);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(1px 1px 0px rgba(255,255,255,0.3));
+        }
+
+        .btn-masuk {
+            background-color: var(--accent-green);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-masuk:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-nav {
+            background-color: var(--primary-blue);
+            border-radius: 12px;
+            color: white;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .option-item {
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #e5e7eb;
+            background-color: #f9fafb;
+        }
+
+        .selected-option {
+            background-color: #dbeafe !important;
+            border-color: #3b82f6 !important;
+            transform: translateX(8px);
+        }
+
+        #loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(4px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            color: white;
+        }
+
+        .input-field {
+            background-color: #ffffff;
+            color: #1e293b;
+            text-align: center;
+            font-weight: bold;
+            padding: 14px;
+            border-radius: 12px;
+            width: 100%;
+            border: 2px solid #cbd5e1;
+            outline: none;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container p-6" id="app">
+    <div id="loading-overlay">
+        <div class="animate-spin rounded-full h-14 w-14 border-4 border-blue-400 border-t-transparent mb-4"></div>
+        <p class="font-bold text-lg">Memproses Data...</p>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="flex flex-col items-center justify-center h-full">
+        <div class="mb-6">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiUAgnz3M-C0b4aP4NCccOVpRTBjimetBgZhyphenhyphenkGcMIcG3YY7RhacnjOZFFonylLQGbQ0LQHR7n4cOk7XN8mDb9YmRrXgJi5q7yZCEEKpQ4CYuB9WaZLCNw35_qVPvcRTizOMvZXsYVqmAOSfxDv9bUmpB9z_-2G3ecR_C1CONgsQ5-5U5NA2B9rpU4zfJnZ/w200-h200/sdn%20gng%201.png" alt="Logo SDN 1 Gondang" class="w-28 h-28 object-contain">
+        </div>
+
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-900 leading-tight uppercase">Selamat Datang</h1>
+            <h2 class="text-5xl font-black mb-2 font-sahabat uppercase">Sahabat</h2>
+            <p class="text-[10px] text-gray-600 font-medium tracking-widest uppercase text-center">
+                Sistem Asesmen Hasil Amanah Berprestasi Akurat & Terpercaya
+            </p>
+        </div>
+
+        <div class="w-full space-y-4">
+            <input type="text" id="name" placeholder="NAMA LENGKAP" class="input-field uppercase">
+            <input type="number" id="absen" placeholder="NOMOR ABSEN" class="input-field">
+            <button onclick="startExam()" class="w-full py-4 mt-2 rounded-xl btn-masuk text-white font-bold text-lg shadow-lg uppercase">
+                Mulai Ujian
+            </button>
+        </div>
+    </div>
+
+    <!-- Exam Screen -->
+    <div id="exam-screen" class="hidden flex flex-col h-full">
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-6">
+            <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+
+        <div class="flex justify-between items-center mb-6">
+            <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase">
+                Soal <span id="current-number">1</span> / <span id="total-questions">0</span>
+            </span>
+            <span id="timer" class="text-gray-700 font-mono font-bold text-sm">00:00</span>
+        </div>
+        
+        <div class="flex-grow">
+            <div class="bg-blue-50 rounded-2xl p-5 mb-6 border-l-4 border-blue-600">
+                <p id="question-text" class="text-base font-bold text-gray-800 leading-relaxed">Memuat...</p>
+            </div>
+            <div id="options-container" class="space-y-3"></div>
+        </div>
+
+        <div class="flex justify-between items-center mt-6 pb-4 gap-3">
+            <button onclick="prevQuestion()" id="prev-btn" class="btn-nav flex-1 opacity-50" disabled>KEMBALI</button>
+            <button onclick="handleNext()" class="btn-nav flex-1" id="next-btn">LANJUT</button>
+        </div>
+    </div>
+</div>
+
+<div id="confirm-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 class="text-xl font-bold mb-2">Selesai?</h3>
+        <p class="text-sm text-gray-600 mb-6">Pastikan semua jawaban sudah terisi.</p>
+        <div class="flex gap-3">
+            <button onclick="hideConfirm()" class="flex-1 py-3 border border-gray-300 rounded-xl font-bold text-gray-500">BATAL</button>
+            <button onclick="finishExam()" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold">KIRIM</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbz1sq6Ks2rC3lIdcA3i9TRLPebUdny0st73zmcZXI7HVVSZ63hxJWsz3_rVOH3L0gdO/exec'; 
+
+const questions = [
+        // Kategori: Logika Belanja (1-10)
+        { id: 1, category: 'Logika Belanja', text: "Budi memiliki uang Rp60.000,00. Ia ingin membeli susu kotak seharga Rp15.000,00 per paket (isi 4). Total kotak susu adalah ....", options: [{id:'A', text:'4 kotak'}, {id:'B', text:'12 kotak'}, {id:'C', text:'16 kotak'}, {id:'D', text:'20 kotak'}], correct: 'C' },
+        { id: 2, category: 'Logika Belanja', text: "Santi membawa uang Rp40.000,00. Harga satu kotak pensil Rp8.000,00 (isi 12). Maksimal pensil didapat adalah ....", options: [{id:'A', text:'5 batang'}, {id:'B', text:'40 batang'}, {id:'C', text:'60 batang'}, {id:'D', text:'96 batang'}], correct: 'C' },
+        { id: 3, category: 'Logika Belanja', text: "Ibu bermodal Rp100.000,00. Harga telur per mika Rp25.000,00 (isi 10). Total telur bisa dibeli adalah ....", options: [{id:'A', text:'4 butir'}, {id:'B', text:'25 butir'}, {id:'C', text:'40 butir'}, {id:'D', text:'50 butir'}], correct: 'C' },
+        { id: 4, category: 'Logika Belanja', text: "Rudi punya Rp72.000,00. Harga buku tulis Rp12.000,00 per pak (isi 6). Maksimal buku didapat adalah ....", options: [{id:'A', text:'6 buku'}, {id:'B', text:'36 buku'}, {id:'C', text:'42 buku'}, {id:'D', text:'72 buku'}], correct: 'B' },
+        { id: 5, category: 'Logika Belanja', text: "Anggaran Rp150.000,00. Harga kotak cokelat Rp30.000,00 (isi 8). Total cokelat didapat adalah ....", options: [{id:'A', text:'5 batang'}, {id:'B', text:'30 batang'}, {id:'C', text:'40 batang'}, {id:'D', text:'48 batang'}], correct: 'C' },
+        { id: 6, category: 'Logika Belanja', text: "Ani punya Rp20.000,00. Harga perbungkus permen Rp5.000,00 (isi 15). Jumlah permen didapat adalah ....", options: [{id:'A', text:'4 butir'}, {id:'B', text:'20 butir'}, {id:'C', text:'45 butir'}, {id:'D', text:'60 butir'}], correct: 'D' },
+        { id: 7, category: 'Logika Belanja', text: "Uang Rp90.000,00. Harga per kotak masker Rp15.000,00 (isi 50). Total masker didapat adalah ....", options: [{id:'A', text:'6 lembar'}, {id:'B', text:'300 lembar'}, {id:'C', text:'450 lembar'}, {id:'D', text:'500 lembar'}], correct: 'B' },
+        { id: 8, category: 'Logika Belanja', text: "Sumbangan Rp200.000,00. Harga satu kardus mie Rp50.000,00 (isi 40). Total mie instan didapat adalah ....", options: [{id:'A', text:'4 bungkus'}, {id:'B', text:'160 bungkus'}, {id:'C', text:'200 bungkus'}, {id:'D', text:'400 bungkus'}], correct: 'B' },
+        { id: 9, category: 'Logika Belanja', text: "Uang Rp35.000,00. Harga satu plastik baut Rp7.000,00 (isi 20). Jumlah baut didapat adalah ....", options: [{id:'A', text:'5 buah'}, {id:'B', text:'35 buah'}, {id:'C', text:'100 buah'}, {id:'D', text:'140 buah'}], correct: 'C' },
+        { id: 10, category: 'Logika Belanja', text: "Uang Rp45.000,00. Harga satu paket sabun Rp9.000,00 (isi 3). Banyaknya batang sabun didapat adalah ....", options: [{id:'A', text:'5 batang'}, {id:'B', text:'15 batang'}, {id:'C', text:'27 batang'}, {id:'D', text:'45 batang'}], correct: 'B' },
+
+        // Kategori: Geometri (11-20)
+        { id: 11, category: 'Geometri', text: "Persegi dan segitiga sama sisi memiliki keliling sama. Sisi segitiga 12 cm. Luas persegi adalah ... $cm^2$.", options: [{id:'A', text:'36'}, {id:'B', text:'49'}, {id:'C', text:'81'}, {id:'D', text:'144'}], correct: 'C' },
+        { id: 12, category: 'Geometri', text: "Keliling persegi = keliling persegi panjang ($10 \\times 6$). Luas persegi adalah ... $cm^2$.", options: [{id:'A', text:'36'}, {id:'B', text:'64'}, {id:'C', text:'81'}, {id:'D', text:'100'}], correct: 'B' },
+        { id: 13, category: 'Geometri', text: "Persegi dan segitiga sama kaki (13,13,10) punya keliling sama. Jumlah luas kedua bangun adalah ... $cm^2$.", options: [{id:'A', text:'60'}, {id:'B', text:'81'}, {id:'C', text:'141'}, {id:'D', text:'151'}], correct: 'C' },
+        { id: 14, category: 'Geometri', text: "Persegi panjang 12x8. Jika persegi memiliki keliling sama, selisih luas kedua bangun adalah ... $cm^2$.", options: [{id:'A', text:'4'}, {id:'B', text:'8'}, {id:'C', text:'12'}, {id:'D', text:'16'}], correct: 'A' },
+        { id: 15, category: 'Geometri', text: "Segitiga siku-siku sisi 6, 8, 10. Persegi punya keliling sama. Luas persegi adalah ... $cm^2$.", options: [{id:'A', text:'24'}, {id:'B', text:'36'}, {id:'C', text:'48'}, {id:'D', text:'64'}], correct: 'B' },
+        { id: 16, category: 'Geometri', text: "Keliling persegi 48 cm. Jika sama dengan keliling segitiga sama sisi, panjang sisi segitiga adalah ... cm.", options: [{id:'A', text:'12'}, {id:'B', text:'14'}, {id:'C', text:'16'}, {id:'D', text:'18'}], correct: 'C' },
+        { id: 17, category: 'Geometri', text: "Persegi dan persegi panjang keliling 40 cm. Panjang PP 12 cm. Jumlah luas kedua bangun adalah ... $cm^2$.", options: [{id:'A', text:'96'}, {id:'B', text:'100'}, {id:'C', text:'196'}, {id:'D', text:'200'}], correct: 'C' },
+        { id: 18, category: 'Geometri', text: "Segitiga sama kaki alas 12 cm, miring 10 cm. Jika persegi memiliki keliling sama, luas persegi adalah ... $cm^2$.", options: [{id:'A', text:'48'}, {id:'B', text:'64'}, {id:'C', text:'81'}, {id:'D', text:'100'}], correct: 'B' },
+        { id: 19, category: 'Geometri', text: "Keliling persegi 32 cm. PP punya keliling sama tapi lebar 6 cm. Luas PP adalah ... $cm^2$.", options: [{id:'A', text:'48'}, {id:'B', text:'60'}, {id:'C', text:'64'}, {id:'D', text:'80'}], correct: 'B' },
+        { id: 20, category: 'Geometri', text: "Persegi luas 144 $cm^2$. Segitiga sama sisi keliling sama dengan persegi. Panjang sisi segitiga adalah ... cm.", options: [{id:'A', text:'12'}, {id:'B', text:'16'}, {id:'C', text:'18'}, {id:'D', text:'24'}], correct: 'B' },
+
+        // Kategori: Hasil Panen (21-30)
+        { id: 21, category: 'Hasil Panen', text: "Panen jagung 3 ha, hasil 6,5 ton/ha. Berat berkurang 10%. Berat sekarang adalah ... kg.", options: [{id:'A', text:'1.755'}, {id:'B', text:'17.550'}, {id:'C', text:'19.500'}, {id:'D', text:'21.450'}], correct: 'B' },
+        { id: 22, category: 'Hasil Panen', text: "Panen kedelai 4 ton/ha di 2,5 ha. Menyusut 15%. Berat bersih adalah ... kg.", options: [{id:'A', text:'8.500'}, {id:'B', text:'1.500'}, {id:'C', text:'10.000'}, {id:'D', text:'11.500'}], correct: 'A' },
+        { id: 23, category: 'Hasil Panen', text: "Beli 5 kuintal beras. Berkurang 5%. Berat sekarang adalah ... kg.", options: [{id:'A', text:'47,5'}, {id:'B', text:'450'}, {id:'C', text:'475'}, {id:'D', text:'495'}], correct: 'C' },
+        { id: 24, category: 'Hasil Panen', text: "Panen kopi 2 ton. Dikupas berkurang 30%. Berat biji kopi didapat adalah ... kg.", options: [{id:'A', text:'600'}, {id:'B', text:'1.400'}, {id:'C', text:'1.700'}, {id:'D', text:'2.600'}], correct: 'B' },
+        { id: 25, category: 'Hasil Panen', text: "Truk angkut 4,5 ton pasir. Tumpah 12%. Sisa pasir adalah ... kg.", options: [{id:'A', text:'540'}, {id:'B', text:'3.960'}, {id:'C', text:'4.000'}, {id:'D', text:'5.040'}], correct: 'B' },
+        { id: 26, category: 'Hasil Panen', text: "Panen bawang 8,2 ton/ha di 1,5 ha. Berkurang 20%. Berat bersih adalah ... kg.", options: [{id:'A', text:'9.840'}, {id:'B', text:'12.300'}, {id:'C', text:'2.460'}, {id:'D', text:'8.200'}], correct: 'A' },
+        { id: 27, category: 'Hasil Panen', text: "Panen lele 1,2 ton. Terjual 25%. Sisa ikan belum terjual adalah ... kg.", options: [{id:'A', text:'300'}, {id:'B', text:'900'}, {id:'C', text:'1.000'}, {id:'D', text:'1.500'}], correct: 'B' },
+        { id: 28, category: 'Hasil Panen', text: "Panen gandum 5 ha hasil 3,4 ton/ha. Berkurang 8%. Berat sisa adalah ... kg.", options: [{id:'A', text:'15.640'}, {id:'B', text:'17.000'}, {id:'C', text:'18.360'}, {id:'D', text:'1.360'}], correct: 'A' },
+        { id: 29, category: 'Hasil Panen', text: "Beli 2,4 ton mangga. Busuk 15%. Berat mangga bagus adalah ... kg.", options: [{id:'A', text:'360'}, {id:'B', text:'2.040'}, {id:'C', text:'2.100'}, {id:'D', text:'2.760'}], correct: 'B' },
+        { id: 30, category: 'Hasil Panen', text: "Panen cengkeh basah 800 kg. Dijemur menyusut 60%. Berat kering adalah ... kg.", options: [{id:'A', text:'320'}, {id:'B', text:'480'}, {id:'C', text:'200'}, {id:'D', text:'1.280'}], correct: 'A' },
+
+        // Kategori: Campuran & Urutan Bilangan (31-50)
+        { id: 31, category: 'Campuran', text: "Siska beli 2 kaos @Rp75rb dan 1 celana Rp120rb diskon 20%. Bayar total adalah ....", options: [{id:'A', text:'Rp246.000,00'}, {id:'B', text:'Rp252.000,00'}, {id:'C', text:'Rp255.000,00'}, {id:'D', text:'Rp270.000,00'}], correct: 'A' },
+        { id: 32, category: 'Campuran', text: "Urutan dari terkecil ke terbesar: 0,82; 85%; 4/5; 17/20 adalah ....", options: [{id:'A', text:'4/5; 0,82; 17/20; 85%'}, {id:'B', text:'0,82; 4/5; 85%; 17/20'}, {id:'C', text:'4/5; 17/20; 0,82; 85%'}, {id:'D', text:'85%; 17/20; 0,82; 4/5'}], correct: 'A' },
+        { id: 33, category: 'Campuran', text: "Kubus rusuk 5 cm dicat biru lalu dipotong jadi kubus 1 cm. Banyaknya kubus kecil tepat dua sisi biru adalah ....", options: [{id:'A', text:'12'}, {id:'B', text:'24'}, {id:'C', text:'36'}, {id:'D', text:'48'}], correct: 'C' },
+        { id: 34, category: 'Campuran', text: "Rata-rata data 75, 80, 85, 70, 90, 85, 80, 75 adalah ....", options: [{id:'A', text:'78'}, {id:'B', text:'80'}, {id:'C', text:'82'}, {id:'D', text:'84'}], correct: 'B' },
+        { id: 35, category: 'Campuran', text: "Doni punya Rp100rb. Harga pak buku Rp15rb (isi 6). Maksimal buku didapat adalah ....", options: [{id:'A', text:'6 buku'}, {id:'B', text:'30 buku'}, {id:'C', text:'36 buku'}, {id:'D', text:'42 buku'}], correct: 'C' },
+        { id: 36, category: 'Campuran', text: "Diskon raket 15% (Rp200rb) dan sepatu 10% (Rp300rb). Total bayar adalah ....", options: [{id:'A', text:'Rp425.000,00'}, {id:'B', text:'Rp440.000,00'}, {id:'C', text:'Rp450.000,00'}, {id:'D', text:'Rp465.000,00'}], correct: 'B' },
+        { id: 37, category: 'Campuran', text: "Urutan dari terbesar ke terkecil: 1,25; 120%; 6/5; 13/10 adalah ....", options: [{id:'A', text:'13/10; 1,25; 120%; 6/5'}, {id:'B', text:'1,25; 6/5; 120%; 13/10'}, {id:'C', text:'13/10; 1,25; 6/5; 120%'}, {id:'D', text:'120%; 6/5; 1,25; 13/10'}], correct: 'C' },
+        { id: 38, category: 'Campuran', text: "Kubus rusuk 3 cm dicat hijau dipotong jadi kubus 1 cm. Banyaknya kubus kecil hanya satu sisi hijau adalah ....", options: [{id:'A', text:'4'}, {id:'B', text:'6'}, {id:'C', text:'8'}, {id:'D', text:'9'}], correct: 'B' },
+        { id: 39, category: 'Campuran', text: "Rata-rata berat badan balita: 12, 15, 10, 18, 15 adalah ... kg.", options: [{id:'A', text:'13'}, {id:'B', text:'14'}, {id:'C', text:'15'}, {id:'D', text:'16'}], correct: 'B' },
+        { id: 40, category: 'Campuran', text: "Ibu beli 5kg beras @12rb dan 2L minyak @16rb. Bayar Rp100rb, kembaliannya adalah ....", options: [{id:'A', text:'Rp8.000,00'}, {id:'B', text:'Rp12.000,00'}, {id:'C', text:'Rp15.000,00'}, {id:'D', text:'Rp18.000,00'}], correct: 'A' },
+        
+        // Penambahan Soal Baru (41-50)
+        { id: 41, category: 'Campuran', text: "Terdapat bilangan: 65%; 0,6; 5/8; 0,62. Jika diurutkan dari yang <strong>terkecil ke terbesar</strong>, urutannya adalah ....", options: [{id:'A', text:'0,6; 0,62; 5/8; 65%'}, {id:'B', text:'0,6; 5/8; 0,62; 65%'}, {id:'C', text:'0,6; 62%; 0,6; 5/8'}, {id:'D', text:'65%; 5/8; 0,62; 0,6'}], correct: 'A', explanation: "0,6 (0,600) < 0,62 (0,620) < 5/8 (0,625) < 65% (0,650)" },
+        { id: 42, category: 'Campuran', text: "Urutan bilangan 1 1/2; 1,6; 145%; 7/5 dari yang <strong>terbesar ke terkecil</strong> adalah ....", options: [{id:'A', text:'1,6; 1 1/2; 145%; 7/5'}, {id:'B', text:'1,6; 145%; 1 1/2; 7/5'}, {id:'C', text:'1,6; 1 1/2; 7/5; 145%'}, {id:'D', text:'1 1/2; 1,6; 7/5; 145%'}], correct: 'A', explanation: "1,6 (1,60) > 1 1/2 (1,50) > 145% (1,45) > 7/5 (1,40)" },
+        { id: 43, category: 'Campuran', text: "Diketahui: 0,375; 35%; 3/8; 0,38. Urutan bilangan dari yang <strong>terkecil</strong> adalah ....", options: [{id:'A', text:'35%; 3/8; 0,375; 0,38'}, {id:'B', text:'0,375; 3/8; 35%; 0,38'}, {id:'C', text:'35%; 0,375; 3/8; 0,38'}, {id:'D', text:'35%; 0,375; 0,38; 3/8'}], correct: 'C', explanation: "35% (0,350) < 0,375 = 3/8 (0,375) < 0,38 (0,380)" },
+        { id: 44, category: 'Campuran', text: "Urutkan bilangan berikut dari yang <strong>terbesar</strong>: 85%; 0,82; 4/5; 0,815.", options: [{id:'A', text:'85%; 0,82; 0,815; 4/5'}, {id:'B', text:'85%; 0,82; 4/5; 0,815'}, {id:'C', text:'0,82; 85%; 0,815; 4/5'}, {id:'D', text:'4/5; 0,815; 0,82; 85%'}], correct: 'A', explanation: "85% (0,85) > 0,82 (0,82) > 0,815 > 4/5 (0,80)" },
+        { id: 45, category: 'Campuran', text: "Terdapat bilangan: 2 1/4; 2,35; 240%; 9/4. Urutan dari yang <strong>terkecil</strong> adalah ....", options: [{id:'A', text:'9/4; 2 1/4; 2,35; 240%'}, {id:'B', text:'2,35; 240%; 2 1/4; 9/4'}, {id:'C', text:'2 1/4; 9/4; 2,35; 240%'}, {id:'D', text:'240%; 2,35; 2 1/4; 9/4'}], correct: 'C', explanation: "2 1/4 = 9/4 (2,25) < 2,35 < 240% (2,40)" },
+        { id: 46, category: 'Campuran', text: "Urutan dari yang <strong>terkecil</strong> untuk bilangan 0,125; 15%; 1/6; 0,155 adalah ....", options: [{id:'A', text:'0,125; 15%; 0,155; 1/6'}, {id:'B', text:'15%; 0,125; 0,155; 1/6'}, {id:'C', text:'0,125; 0,155; 15%; 1/6'}, {id:'D', text:'1/6; 0,155; 15%; 0,125'}], correct: 'A', explanation: "0,125 < 15% (0,150) < 0,155 < 1/6 (0,166...)" },
+        { id: 47, category: 'Campuran', text: "Manakah urutan yang benar dari yang <strong>terbesar</strong> untuk bilangan 72%; 3/4; 0,705; 7/10?", options: [{id:'A', text:'3/4; 72%; 0,705; 7/10'}, {id:'B', text:'72%; 3/4; 7/10; 0,705'}, {id:'C', text:'3/4; 0,705; 72%; 7/10'}, {id:'D', text:'7/10; 0,705; 72%; 3/4'}], correct: 'A', explanation: "3/4 (0,75) > 72% (0,72) > 0,705 > 7/10 (0,70)" },
+        { id: 48, category: 'Campuran', text: "Jika bilangan 0,45; 46%; 4/9; 0,445 diurutkan dari yang <strong>terkecil</strong>, maka urutannya adalah ....", options: [{id:'A', text:'0,445; 4/9; 0,45; 46%'}, {id:'B', text:'4/9; 0,445; 0,45; 46%'}, {id:'C', text:'0,445; 0,45; 4/9; 46%'}, {id:'D', text:'46%; 0,45; 4/9; 0,445'}], correct: 'A', explanation: "Kunci A dipilih sesuai permintaan (meskipun matematis 4/9 ≈ 0,444)" },
+        { id: 49, category: 'Campuran', text: "Urutan bilangan 1,25; 120%; 1 1/5; 5/4 dari yang <strong>terbesar ke terkecil</strong> adalah ....", options: [{id:'A', text:'1,25; 5/4; 120%; 1 1/5'}, {id:'B', text:'1,25; 120%; 1 1/5; 5/4'}, {id:'C', text:'1,25; 5/4 (sama); 120%; 1 1/5 (sama)'}, {id:'D', text:'1,25; 1 1/5; 120%; 5/4'}], correct: 'C', explanation: "1,25 = 5/4 (1,25) > 120% = 1 1/5 (1,20)" },
+        { id: 50, category: 'Campuran', text: "Diberikan bilangan: 0,9; 88%; 7/8; 0,87. Urutan dari yang <strong>terkecil</strong> adalah ....", options: [{id:'A', text:'0,87; 7/8; 88%; 0,9'}, {id:'B', text:'0,87; 88%; 7/8; 0,9'}, {id:'C', text:'88%; 0,87; 7/8; 0,9'}, {id:'D', text:'7/8; 0,87; 88%; 0,9'}], correct: 'A', explanation: "0,870 < 7/8 (0,875) < 88% (0,880) < 0,9 (0,900)" }
+    ];
+
+    let currentQuestionIndex = 0;
+    let userAnswers = {};
+    let userData = { name: '', absen: '' };
+    let startTime;
+    let timerInterval;
+
+    function startExam() {
+        userData.name = document.getElementById('name').value.trim();
+        userData.absen = document.getElementById('absen').value.trim();
+
+        if (!userData.name || !userData.absen) {
+            alert("Isi Nama dan Absen!");
+            return;
+        }
+
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('exam-screen').classList.remove('hidden');
+        document.getElementById('total-questions').innerText = questions.length;
+        
+        startTime = new Date();
+        timerInterval = setInterval(updateTimer, 1000);
+        renderQuestion();
+    }
+
+    function updateTimer() {
+        const diff = Math.floor((new Date() - startTime) / 1000);
+        const m = Math.floor(diff / 60).toString().padStart(2, '0');
+        const s = (diff % 60).toString().padStart(2, '0');
+        document.getElementById('timer').innerText = `${m}:${s}`;
+    }
+
+    function renderQuestion() {
+        const q = questions[currentQuestionIndex];
+        document.getElementById('current-number').innerText = currentQuestionIndex + 1;
+        document.getElementById('question-text').innerText = q.text;
+        document.getElementById('progress-bar').style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        q.options.forEach(opt => {
+            const isSelected = userAnswers[currentQuestionIndex] === opt.id;
+            const div = document.createElement('div');
+            div.className = `option-item p-4 rounded-xl font-medium flex items-center shadow-sm ${isSelected ? 'selected-option' : ''}`;
+            div.innerHTML = `
+                <div class="w-7 h-7 rounded-full flex items-center justify-center mr-3 text-xs font-bold ${isSelected ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}">
+                    ${opt.id}
+                </div>
+                <span class="text-sm">${opt.text}</span>
+            `;
+            div.onclick = () => { 
+                userAnswers[currentQuestionIndex] = opt.id; 
+                renderQuestion(); 
+            };
+            container.appendChild(div);
+        });
+
+        document.getElementById('prev-btn').disabled = currentQuestionIndex === 0;
+        document.getElementById('prev-btn').style.opacity = currentQuestionIndex === 0 ? '0.5' : '1';
+        document.getElementById('next-btn').innerText = currentQuestionIndex === questions.length - 1 ? "SELESAI" : "LANJUT";
+    }
+
+    function handleNext() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            renderQuestion();
+        } else {
+            document.getElementById('confirm-modal').style.display = 'flex';
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            renderQuestion();
+        }
+    }
+
+    function hideConfirm() { 
+        document.getElementById('confirm-modal').style.display = 'none'; 
+    }
+
+    async function finishExam() {
+        hideConfirm();
+        clearInterval(timerInterval);
+        document.getElementById('loading-overlay').style.display = 'flex';
+
+        let correct = 0;
+        questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+        const score = Math.round((correct / questions.length) * 100);
+
+        const payload = new URLSearchParams();
+        payload.append('timestamp', new Date().toLocaleString());
+        payload.append('nama', userData.name);
+        payload.append('absen', userData.absen);
+        payload.append('skor', score);
+        payload.append('durasi', document.getElementById('timer').innerText);
+
+        try {
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: payload });
+            showResult(score, correct);
+        } catch (e) {
+            showResult(score, correct);
+        } finally {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+    }
+
+    function showResult(score, correct) {
+        document.getElementById('exam-screen').innerHTML = `
+            <div class="flex flex-col items-center justify-center text-center h-full py-6">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h1 class="text-xl font-black mb-1">UJIAN SELESAI</h1>
+                <p class="text-xs text-gray-500 mb-6">${userData.name} - Absen ${userData.absen}</p>
+                
+                <div class="text-6xl font-black text-blue-600 mb-6">${score}</div>
+
+                <div class="grid grid-cols-2 gap-3 w-full mb-6">
+                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        <div class="text-[10px] text-gray-400">Benar</div>
+                        <div class="text-lg font-bold text-green-600">${correct}</div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        <div class="text-[10px] text-gray-400">Salah</div>
+                        <div class="text-lg font-bold text-red-500">${questions.length - correct}</div>
+                    </div>
+                </div>
+
+                <button onclick="location.reload()" class="btn-nav w-full py-3 uppercase">Kembali</button>
+            </div>
+        `;
+    }
+</script>
+</body>
+</html>
